@@ -17,6 +17,9 @@ class QuestionViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.title = "💡 Swipe 👉 to Submit, 👈 to Quit"
+        
         tableView.delegate = self
         tableView.dataSource = self
         
@@ -24,6 +27,29 @@ class QuestionViewController: UIViewController, UITableViewDelegate, UITableView
             fatalError("No quiz selected")
         }
         loadQuestion()
+        
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeRight))
+        swipeRight.direction = .right
+        view.addGestureRecognizer(swipeRight)
+
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeLeft))
+        swipeLeft.direction = .left
+        view.addGestureRecognizer(swipeLeft)
+        
+    }
+    
+    @objc func didSwipeRight() {
+        submitTapped(submitButton)
+    }
+    
+    @objc func didSwipeLeft() {
+        let alert = UIAlertController(title: "Quit Quiz", message: "Are you sure you want to quit?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Yes", style: .destructive) { _ in
+            QuizManager.shared.reset()
+            self.navigationController?.popToRootViewController(animated: true)
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(alert, animated: true)
     }
 
     func loadQuestion() {

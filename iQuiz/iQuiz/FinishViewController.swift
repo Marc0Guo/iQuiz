@@ -14,7 +14,7 @@ class FinishViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.title = "Quiz Complete!"
         let total = QuizManager.shared.questions.count
         let score = QuizManager.shared.score
 
