@@ -42,4 +42,41 @@ class QuizListViewController: UIViewController, UITableViewDelegate, UITableView
         cell.quizImageView.image = UIImage(named: iconName)
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "toQuestion", sender: self)
+    }
+
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toQuestion",
+           let indexPath = tableView.indexPathForSelectedRow {
+            
+            let (title, _, _) = quizzes[indexPath.row]
+            
+            var selectedQuestions: [Question] = []
+            
+            switch title {
+            case "Mathematics":
+                selectedQuestions = [
+                    Question(text: "Test = 1", options: ["1", "2", "3"], correctIndex: 0),
+                    Question(text: "Test = 2", options: ["1", "2", "3"], correctIndex: 1)
+                ]
+            case "Marvel Super Heroes":
+                selectedQuestions = [
+                    Question(text: "Test = 1", options: ["1", "2", "3"], correctIndex: 0),
+                    Question(text: "Test = 2", options: ["1", "2", "3"], correctIndex: 1)
+                ]
+            case "Science":
+                selectedQuestions = [
+                    Question(text: "Test = 1", options: ["1", "2", "3"], correctIndex: 0),
+                    Question(text: "Test = 2", options: ["1", "2", "3"], correctIndex: 1)
+                ]
+            default:
+                break
+            }
+            
+            QuizManager.shared.currentQuiz = Quiz(title: title, questions: selectedQuestions)
+        }
+    }
 }
