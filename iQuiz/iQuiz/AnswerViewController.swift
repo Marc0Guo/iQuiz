@@ -18,18 +18,18 @@ class AnswerViewController: UIViewController {
         
         self.title = "💡 Swipe 👉 to Next, 👈 to Quit"
         
-        guard QuizManager.shared.currentIndex < QuizManager.shared.questions.count else {
+        guard QuizManager.shared.currentQuestionIndex < QuizManager.shared.questions.count else {
             questionLabel.text = "No question"
             answerLabel.text = ""
             resultLabel.text = ""
             return
         }
 
-        let question = QuizManager.shared.questions[QuizManager.shared.currentIndex]
+        let question = QuizManager.shared.questions[QuizManager.shared.currentQuestionIndex]
         let selected = QuizManager.shared.selectedIndex ?? -1
         
         questionLabel.text = question.text
-        answerLabel.text = "Answer: \(question.options[question.correctIndex])"
+        answerLabel.text = "Answer: \(question.answers[question.correctIndex ?? 0])"
         resultLabel.text = selected == question.correctIndex ? "✅ Correct!" : "❌ Wrong!"
         resultLabel.textColor = selected == question.correctIndex ? .systemGreen : .systemRed
         
@@ -57,8 +57,8 @@ class AnswerViewController: UIViewController {
     }
 
     @IBAction func nextTapped(_ sender: UIButton) {
-        if QuizManager.shared.currentIndex + 1 < QuizManager.shared.questions.count {
-            QuizManager.shared.currentIndex += 1
+        if QuizManager.shared.currentQuestionIndex + 1 < QuizManager.shared.questions.count {
+            QuizManager.shared.currentQuestionIndex += 1
             performSegue(withIdentifier: "toQuestion", sender: self)
         } else {
             performSegue(withIdentifier: "toFinish", sender: self)

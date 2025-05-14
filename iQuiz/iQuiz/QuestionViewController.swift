@@ -53,8 +53,8 @@ class QuestionViewController: UIViewController, UITableViewDelegate, UITableView
     }
 
     func loadQuestion() {
-        guard QuizManager.shared.currentIndex < QuizManager.shared.questions.count else { return }
-        let question = QuizManager.shared.questions[QuizManager.shared.currentIndex]
+        guard QuizManager.shared.currentQuestionIndex < QuizManager.shared.questions.count else { return }
+        let question = QuizManager.shared.questions[QuizManager.shared.currentQuestionIndex]
         questionLabel.text = question.text
         selectedIndex = nil
         tableView.reloadData()
@@ -63,7 +63,7 @@ class QuestionViewController: UIViewController, UITableViewDelegate, UITableView
     @IBAction func submitTapped(_ sender: UIButton) {
         guard let selected = selectedIndex else { return }
         QuizManager.shared.selectedIndex = selected
-        let currentQuestion = QuizManager.shared.questions[QuizManager.shared.currentIndex]
+        let currentQuestion = QuizManager.shared.questions[QuizManager.shared.currentQuestionIndex]
         if selected == currentQuestion.correctIndex {
             QuizManager.shared.score += 1
         }
@@ -72,14 +72,14 @@ class QuestionViewController: UIViewController, UITableViewDelegate, UITableView
 
     // MARK: - TableView
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let question = QuizManager.shared.questions[QuizManager.shared.currentIndex]
-        return question.options.count
+        let question = QuizManager.shared.questions[QuizManager.shared.currentQuestionIndex]
+        return question.answers.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath)
-        let question = QuizManager.shared.questions[QuizManager.shared.currentIndex]
-        cell.textLabel?.text = question.options[indexPath.row]
+        let question = QuizManager.shared.questions[QuizManager.shared.currentQuestionIndex]
+        cell.textLabel?.text = question.answers[indexPath.row]
         cell.accessoryType = indexPath.row == selectedIndex ? .checkmark : .none
         return cell
     }

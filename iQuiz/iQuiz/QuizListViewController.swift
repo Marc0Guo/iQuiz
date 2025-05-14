@@ -10,18 +10,48 @@ import UIKit
 class QuizListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
+    
+    var refreshTimer: Timer? 
 
-    let quizzes = [
-        ("Mathematics", "Math 127", "math_icon"),
-        ("Marvel Super Heroes", "Marv 311", "marvel_icon"),
-        ("Science", "Sci 288", "science_icon")
-    ]
+    var quizzes: [Quiz] {
+        return QuizManager.shared.quizzes
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "iQuiz"
         tableView.delegate = self
         tableView.dataSource = self
+
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadQuizData), name: Notification.Name("QuizDataUpdated"), object: nil)
+
+        let url = UserDefaults.standard.string(forKey: "quizURL") ?? "http://tednewardsandbox.site44.com/questions.json"
+        QuizManager.shared.fetchQuizData(from: url) { success in
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+        
+        let interval = UserDefaults.standard.double(forKey: "refreshInterval")
+        if interval > 0 {
+            refreshTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
+                let url = UserDefaults.standard.string(forKey: "quizURL") ?? "http://tednewardsandbox.site44.com/questions.json"
+                QuizManager.shared.fetchQuizData(from: url) { _ in
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
+            }
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        refreshTimer?.invalidate()
     }
 
     @IBAction func settingsTapped(_ sender: UIBarButtonItem) {
@@ -36,10 +66,10 @@ class QuizListViewController: UIViewController, UITableViewDelegate, UITableView
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "quizCell", for: indexPath) as! QuizCell
-        let (title, description, iconName) = quizzes[indexPath.row]
-        cell.titleLabel.text = title
-        cell.descriptionLabel.text = description
-        cell.quizImageView.image = UIImage(named: iconName)
+        let quiz = quizzes[indexPath.row]
+        cell.titleLabel.text = quiz.title
+        cell.descriptionLabel.text = quiz.desc
+        cell.quizImageView.image = UIImage(named: quiz.iconName ?? "AppIcon")
         return cell
     }
     
@@ -52,31 +82,24 @@ class QuizListViewController: UIViewController, UITableViewDelegate, UITableView
         if segue.identifier == "toQuestion",
            let indexPath = tableView.indexPathForSelectedRow {
             
-            let (title, _, _) = quizzes[indexPath.row]
-            
-            var selectedQuestions: [Question] = []
-            
-            switch title {
-            case "Mathematics":
-                selectedQuestions = [
-                    Question(text: "Test = 1", options: ["1", "2", "3"], correctIndex: 0),
-                    Question(text: "Test = 2", options: ["1", "2", "3"], correctIndex: 1)
-                ]
-            case "Marvel Super Heroes":
-                selectedQuestions = [
-                    Question(text: "Test = 1", options: ["1", "2", "3"], correctIndex: 0),
-                    Question(text: "Test = 2", options: ["1", "2", "3"], correctIndex: 1)
-                ]
-            case "Science":
-                selectedQuestions = [
-                    Question(text: "Test = 1", options: ["1", "2", "3"], correctIndex: 0),
-                    Question(text: "Test = 2", options: ["1", "2", "3"], correctIndex: 1)
-                ]
-            default:
-                break
+            let quiz = quizzes[indexPath.row]
+            QuizManager.shared.currentQuiz = quiz
+        }
+    }
+    
+    @objc func reloadQuizData() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+
+    @objc func refreshData() {
+        let url = UserDefaults.standard.string(forKey: "quizURL") ?? "http://tednewardsandbox.site44.com/questions.json"
+        QuizManager.shared.fetchQuizData(from: url) { success in
+            DispatchQueue.main.async {
+                self.tableView.refreshControl?.endRefreshing()
+                self.tableView.reloadData()
             }
-            
-            QuizManager.shared.currentQuiz = Quiz(title: title, questions: selectedQuestions)
         }
     }
 }
