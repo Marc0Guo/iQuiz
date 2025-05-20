@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>StringsTable</key>
+	<string>Root</string>
+	<key>PreferenceSpecifiers</key>
+	<array>
+
+		<!-- Section 1 Header -->
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Input Quiz URL</string>
+		</dict>
+
+		<!-- Text Field -->
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Quiz URL</string>
+			<key>DefaultValue</key>
+			<string>https://tednewardsandbox.site44.com/questions.json</string>
+			<key>Key</key>
+			<string>dataURL</string>
+		</dict>
+
+		<!-- Section 2 Header -->
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Control Refresh Seconds (1–300)</string>
+		</dict>
+
+		<!-- Slider -->
+		<dict>
+			<key>Type</key>
+			<string>PSSliderSpecifier</string>
+			<key>Title</key>
+			<string>Refresh Interval</string>
+			<key>Key</key>
+			<string>refreshInterval</string>
+			<key>DefaultValue</key>
+			<integer>60</integer>
+			<key>MinimumValue</key>
+			<integer>1</integer>
+			<key>MaximumValue</key>
+			<integer>300</integer>
+		</dict>
+
+	</array>
+</dict>
+</plist>

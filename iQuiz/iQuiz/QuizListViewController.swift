@@ -8,15 +8,15 @@
 import UIKit
 
 class QuizListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
+
     @IBOutlet weak var tableView: UITableView!
-    
-    var refreshTimer: Timer? 
+
+    var refreshTimer: Timer?
 
     var quizzes: [Quiz] {
         return QuizManager.shared.quizzes
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "iQuiz"
@@ -35,7 +35,7 @@ class QuizListViewController: UIViewController, UITableViewDelegate, UITableView
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
         tableView.refreshControl = refreshControl
-        
+
         let interval = UserDefaults.standard.double(forKey: "refreshInterval")
         if interval > 0 {
             refreshTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
@@ -48,16 +48,18 @@ class QuizListViewController: UIViewController, UITableViewDelegate, UITableView
             }
         }
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         refreshTimer?.invalidate()
     }
 
     @IBAction func settingsTapped(_ sender: UIBarButtonItem) {
-        let alert = UIAlertController(title: "Settings", message: "Settings go here", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+            if UIApplication.shared.canOpenURL(settingsUrl) {
+                UIApplication.shared.open(settingsUrl)
+            }
+        }
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -72,21 +74,21 @@ class QuizListViewController: UIViewController, UITableViewDelegate, UITableView
         cell.quizImageView.image = UIImage(named: quiz.iconName ?? "AppIcon")
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "toQuestion", sender: self)
     }
 
-    
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "toQuestion",
            let indexPath = tableView.indexPathForSelectedRow {
-            
+
             let quiz = quizzes[indexPath.row]
             QuizManager.shared.currentQuiz = quiz
         }
     }
-    
+
     @objc func reloadQuizData() {
         DispatchQueue.main.async {
             self.tableView.reloadData()

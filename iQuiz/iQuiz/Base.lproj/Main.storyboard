@@ -82,7 +82,6 @@
                             <color key="tintColor" systemColor="systemGray2Color"/>
                             <connections>
                                 <action selector="settingsTapped:" destination="BYZ-38-t0r" id="FlK-Hh-E2A"/>
-                                <segue destination="I2c-gj-3JH" kind="show" id="ndx-gB-YQ9"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -104,7 +103,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalCentering" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Zbt-MJ-hcL">
-                                <rect key="frame" x="16" y="178" width="361" height="590"/>
+                                <rect key="frame" x="16" y="134" width="361" height="634"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Hrt-wI-4sc">
                                         <rect key="frame" x="0.0" y="0.0" width="361" height="92.666666666666671"/>
@@ -129,16 +128,16 @@
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="dlQ-qx-eHF">
-                                        <rect key="frame" x="75.666666666666686" y="284.33333333333331" width="210" height="50.333333333333314"/>
+                                        <rect key="frame" x="71.666666666666686" y="306.33333333333331" width="218" height="50.333333333333314"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aTL-I9-xNW">
-                                                <rect key="frame" x="0.0" y="0.0" width="210" height="20.333333333333332"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="218" height="20.333333333333332"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="60" minValue="1" maxValue="300" translatesAutoresizingMaskIntoConstraints="NO" id="gMe-iM-sO5">
-                                                <rect key="frame" x="-2" y="20.333333333333371" width="214" height="31"/>
+                                                <rect key="frame" x="-2" y="20.333333333333371" width="222" height="31"/>
                                                 <connections>
                                                     <action selector="intervalSliderChanged:" destination="I2c-gj-3JH" eventType="valueChanged" id="ZfL-E1-3sH"/>
                                                 </connections>
@@ -146,7 +145,7 @@
                                         </subviews>
                                     </stackView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sUi-Db-VOv">
-                                        <rect key="frame" x="125" y="555.66666666666663" width="111.33333333333331" height="34.333333333333371"/>
+                                        <rect key="frame" x="125" y="599.66666666666663" width="111.33333333333331" height="34.333333333333371"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="tinted" title="Check Now"/>
                                         <connections>
