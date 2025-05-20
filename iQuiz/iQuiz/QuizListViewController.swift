@@ -12,6 +12,7 @@ class QuizListViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak var tableView: UITableView!
 
     var refreshTimer: Timer?
+    let refreshControl = UIRefreshControl()
 
     var quizzes: [Quiz] {
         return QuizManager.shared.quizzes
@@ -23,35 +24,20 @@ class QuizListViewController: UIViewController, UITableViewDelegate, UITableView
         tableView.delegate = self
         tableView.dataSource = self
 
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadQuizData), name: Notification.Name("QuizDataUpdated"), object: nil)
-
-        let url = UserDefaults.standard.string(forKey: "quizURL") ?? "http://tednewardsandbox.site44.com/questions.json"
-        QuizManager.shared.fetchQuizData(from: url) { success in
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-        }
-
-        let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
         tableView.refreshControl = refreshControl
 
-        let interval = UserDefaults.standard.double(forKey: "refreshInterval")
-        if interval > 0 {
-            refreshTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
-                let url = UserDefaults.standard.string(forKey: "quizURL") ?? "http://tednewardsandbox.site44.com/questions.json"
-                QuizManager.shared.fetchQuizData(from: url) { _ in
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
-                }
-            }
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadQuizData), name: Notification.Name("QuizDataUpdated"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+
+        updateRefreshTimerAndFetch()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         refreshTimer?.invalidate()
+        NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     @IBAction func settingsTapped(_ sender: UIBarButtonItem) {
@@ -95,12 +81,47 @@ class QuizListViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
 
+    @objc func appWillEnterForeground() {
+        updateRefreshTimerAndFetch()
+    }
+
     @objc func refreshData() {
         let url = UserDefaults.standard.string(forKey: "quizURL") ?? "http://tednewardsandbox.site44.com/questions.json"
         QuizManager.shared.fetchQuizData(from: url) { success in
             DispatchQueue.main.async {
-                self.tableView.refreshControl?.endRefreshing()
+                if success {
+                    if !self.quizzes.isEmpty {
+                        let source = QuizManager.shared.isConnectedToInternet() ? "network" : "local"
+                        self.refreshControl.attributedTitle = NSAttributedString(string: "Last updated: \(Date().formatted()) (\(source))")
+                    } else {
+                        self.refreshControl.attributedTitle = NSAttributedString(string: "No quizzes available")
+                    }
+                } else {
+                    self.refreshControl.attributedTitle = NSAttributedString(string: "Failed to load quizzes")
+                }
                 self.tableView.reloadData()
+                self.refreshControl.endRefreshing()
+            }
+        }
+    }
+
+    func updateRefreshTimerAndFetch() {
+        refreshTimer?.invalidate()
+        let url = UserDefaults.standard.string(forKey: "quizURL") ?? "http://tednewardsandbox.site44.com/questions.json"
+        let interval = UserDefaults.standard.double(forKey: "refreshInterval")
+        QuizManager.shared.fetchQuizData(from: url) { success in
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+        if interval > 0 {
+            refreshTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
+                let url = UserDefaults.standard.string(forKey: "quizURL") ?? "http://tednewardsandbox.site44.com/questions.json"
+                QuizManager.shared.fetchQuizData(from: url) { _ in
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
             }
         }
     }
